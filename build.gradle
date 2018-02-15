@@ -1,0 +1,145 @@
+/**
+ * Gradle test project
+ */
+
+plugins {
+    // Apply the java plugin to add support for Java
+    //id 'java'
+	
+	// Apply the groovy plugin to add support for Groovy
+	id 'groovy'
+	
+	// Apply the eclipse plugin
+	id 'eclipse'
+
+    // Apply the application plugin to add support for building an application
+    id 'application'
+	
+	// Apply build scan
+	id 'com.gradle.build-scan' version '1.11'
+	
+	// Apply war archive
+	id 'war'
+}
+
+buildScan {
+	licenseAgreementUrl = "https://gradle.com/terms-of-service"
+	licenseAgree = 'yes'
+	// define an invorenement
+	tag 'CI'
+}
+
+ext {
+	author = 'Tartuffe'
+	versionFile = file('version.properties')
+}
+
+group = 'po.inc'
+archivesBaseName = 'inc'
+version = '1.0-SNAPSHOT'
+sourceCompatibility = 1.9
+// Define the main class for the application
+mainClassName = 'po.inc.App'
+
+dependencies {
+	// Use the latest Groovy version for building this library
+	compile 'org.codehaus.groovy:groovy-all:2.4.12'
+	
+    // This dependency is found on compile classpath of this component and consumers.
+    compile 'com.google.guava:guava:23.0'
+
+    // Use JUnit test framework
+    testCompile 'junit:junit:4.12'
+}
+
+// In this section you declare where to find the dependencies of your project
+repositories {
+	
+	mavenCentral()
+	
+    jcenter()
+}
+
+jar {
+	manifest {
+		attributes 'Main-Class' : 'po.inc.App'
+	}
+}
+
+/**
+ * WAR SECTION
+ */
+
+webAppDirName = 'webfiles'
+
+war {
+	from 'static'
+}
+
+/**
+ * WRAPPER
+ */
+
+task wrapper(type : Wrapper) {
+	gradleVersion = '4.5.1'
+	//distributionUrl = ''
+	//distributionPath = ''
+}
+
+
+import api.java.*
+import api.groovy.*
+
+task fromFtpGTask(type : FtpG, group : "Training", description : 'Get a host') {
+	host = '127.0.0.8'
+	author = project.author
+}
+
+task fromFtpJTask(type : FtpJ, group : "Training", description : 'Get a host', dependsOn : fromFtpGTask) {
+	host = '127.0.0.9'
+}
+
+
+
+
+
+/**
+ * VERSIONNING
+ */
+
+import api.groovy.version.*
+
+version = new Version(versionFile)
+
+task printVersion(group: 'z_versionning', description : 'Get project version') {
+	doLast {
+		logger.quiet "Version : $version"
+	}
+}
+
+
+/**
+ * Gradle Labs
+ */
+
+task session {
+	doLast {
+		ping()
+	}
+}
+
+def ping() {
+	ant.echo(message: 'cycles') 
+}
+
+3.times {
+	task "ping$it" {
+		doLast {
+			println "127.0.0.1 for $it"
+		}
+	}
+}
+
+ping0.dependsOn session
+ping2.dependsOn ping1, ping0
+task together(dependsOn : ping2)

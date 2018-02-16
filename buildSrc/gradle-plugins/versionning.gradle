@@ -1,0 +1,34 @@
+/**
+ * Gradle versionning plugin
+ * versionning.gradle
+ */
+
+ext {
+	
+	version = []
+	
+}
+
+/**
+ * VERSIONNING
+ */
+
+import api.project.version.*
+
+version = new Version( versionFile ).getVersion( )
+
+task printVersion(group: groups.version, description : 'Get project version') {
+	
+	doLast {
+		
+		logger.quiet "Version : $version"
+		
+	}
+}
+
+task makeReleaseVersion(type : ReleaseVersionTask, group : groups.version, description : 'Make a release version of the project') {
+	
+	release = version.release
+	destFile = versionFile
+	
+}

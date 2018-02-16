@@ -2,6 +2,8 @@
  * Gradle test project
  */
 
+// Apply external plugings
+ 
 plugins {
     // Apply the java plugin to add support for Java
     //id 'java'
@@ -22,6 +24,8 @@ plugins {
 	id 'war'
 }
 
+apply plugin: api.project.plugins.Release
+
 buildScan {
 	licenseAgreementUrl = "https://gradle.com/terms-of-service"
 	licenseAgree = 'yes'
@@ -32,11 +36,22 @@ buildScan {
 ext {
 	author = 'Tartuffe'
 	versionFile = file('version.properties')
+	groups = [
+		version : 'z_versionning'
+		, backup : 'z_backup'
+		]
 }
+// Apply internal plugings
+
+// apply versionning plugin
+apply from : "buildSrc/gradle-plugins/versionning.gradle"
+
+// apply ditribution plugin
+apply from : "buildSrc/gradle-plugins/distribution.gradle"
+
 
 group = 'po.inc'
 archivesBaseName = 'inc'
-version = '1.0-SNAPSHOT'
 sourceCompatibility = 1.9
 // Define the main class for the application
 mainClassName = 'po.inc.App'
@@ -87,8 +102,8 @@ task wrapper(type : Wrapper) {
 }
 
 
-import api.java.*
-import api.groovy.*
+import api.java.test.*
+import api.groovy.test.*
 
 task fromFtpGTask(type : FtpG, group : "Training", description : 'Get a host') {
 	host = '127.0.0.8'
@@ -97,24 +112,6 @@ task fromFtpGTask(type : FtpG, group : "Training", description : 'Get a host') {
 
 task fromFtpJTask(type : FtpJ, group : "Training", description : 'Get a host', dependsOn : fromFtpGTask) {
 	host = '127.0.0.9'
-}
-
-
-
-
-
-/**
- * VERSIONNING
- */
-
-import api.groovy.version.*
-
-version = new Version(versionFile)
-
-task printVersion(group: 'z_versionning', description : 'Get project version') {
-	doLast {
-		logger.quiet "Version : $version"
-	}
 }
 
 

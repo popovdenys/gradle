@@ -119,6 +119,15 @@ task fromFtpJTask(type : FtpJ, group : "Training", description : 'Get a host', d
  * Gradle Labs
  */
 
+configurations.compile {	//.all
+	resolutionStrategy.eachDependency {
+		if (it.requested.name == 'commons-logging') {
+			it.useVersion '1.1'
+		}
+	}
+}
+
+
 task session {
 	doLast {
 		ping()
